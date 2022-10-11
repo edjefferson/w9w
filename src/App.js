@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, FeatureGroup, useMap, ZoomControl, useMapEvents} from 'react-leaflet'
@@ -60,6 +58,7 @@ const App = () => {
   const [zoomLevel,setZoomLevel] = useState(15)
   const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState([])
+  const [aboutBox,setAboutBox] = useState(0)
   const [copyState,setCopyState] = useState(0)
   const [inputState,setInputState] = useState(0)
   const intervalRef = useRef();
@@ -303,8 +302,20 @@ const App = () => {
 
   return (
     <div className="App">
-      <div id="title"><h1><span id="slashes">{"/////////"}</span>what9whos</h1></div>
-
+      <div id="title"><h1><span id="slashes">{"/////////"}</span>what9whos</h1> <InfoOutlinedIcon onClick={()=> setAboutBox(1)} style={{color: "white"}} /></div>
+      {aboutBox ? <div id="aboutbox">
+        <div id="abtitle"><h2><span id="slashes">{"/////////"}</span>what9whos - about</h2> <CloseIcon onClick={()=> setAboutBox(0)} style={{color: "white"}} /></div>
+        <div id="about-content">
+          <h3>The most Doctor Who-based way to talk about location</h3>
+          <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing 9 of the names of actors who have played TV (and film's) Doctor Who?</p>
+          <p>We had, for some reason, so that's why we created what9whos.</p>
+          <h4>Disclaimer</h4>
+          <p>We would not recommend using what9whos in any kind of emergency situation (or at all).</p>
+          <p>Doctor Who is the property of the BBC who have absolutely nothing to do with what9whos, so please don't blame them.</p>
+          <p><a id="sitelink" href="https://edjefferson.com">edjefferson.com</a></p>
+          </div>
+        
+        </div> : ""}
 
       <div id="search-box" className="search-box">
         
