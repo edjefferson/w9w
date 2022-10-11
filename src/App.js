@@ -52,7 +52,7 @@ const App = () => {
   const [coords,setCoords] = useState({lat: 51.509865, lng: -0.118092})
   const [zoomLevel,setZoomLevel] = useState(15)
   const [placeLabel,setPlaceLabel] = useState("London")
-  const [value,setValue] = useState("")
+  const [value,setValue] = useState([])
   const intervalRef = useRef();
 
   useEffect(() => {
@@ -156,7 +156,7 @@ const App = () => {
     numbers.push(final_grid_doc)
 
     let rotatedNumbers = rotateNumbers(numbers)
-    return "/////////" + rotatedNumbers.map(n => wholist[n]).join(".")
+    return rotatedNumbers.map(n => wholist[n])
   }
 
 
@@ -249,32 +249,30 @@ const App = () => {
 
   useEffect(() => {
     setValue(getEncodedWhos(coords.lat,coords.lng))
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&zoom=15`,
-        {method: "GET"})
-          .then((response) => response.json())
-          .then((data) => {
-            
-
-            setPlaceLabel(data.address.postcode ? data.display_name.replace(`, ${data.address.postcode}`,"") : data.display_name)
-          }).catch(error => {
-            setPlaceLabel("")
-        })
-
   }, [coords])
 
 
-
+  const formatw9w = (value) => {
+    
+    return <ul id="wholist">{value.map((w,i) => <li className="wholistwho">{i === value.length -1 ? w :  w + "."}</li>)}</ul>
+  }
 
   return (
     <div className="App">
       <div id="title"><h1><span id="slashes">{"/////////"}</span>what9whos</h1></div>
-      <div id="search-box"><Autocomplete
+
+
+      <div id="search-box" className="search-box">
+        
+
+       
+        <Autocomplete
         disablePortal
         id="autocomplete-box"
         noOptionsText={`Search for any place or what9whos address
         e.g. Ianto Jones Shrine\
         /////////Smith.Cushing.Tennant.Capaldi.CBaker.Tennant.Gatwa.Capaldi.Smith`}
-        sx ={{fontFamily: "Source Sans Pro"}}
+        sx ={{fontFamily: "Source Sans Pro", display: "none"}}
         getOptionLabel={(option) =>
           typeof option === 'string' ? option : option.label
         }
@@ -317,8 +315,10 @@ const App = () => {
 
         isOptionEqualToValue={(option, value) => option.id === value.id}
       />
+
       <div id="placeLabel">{placeLabel}</div>
       </div>
+      <div id="search-box-new" className="search-box"><div id="w9waddress"><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div></div>
 
       <div id="mapcontainer">
         <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >

@@ -34,13 +34,49 @@
   padding-left: 0.5em;
   padding-top: 0.25em;
 }
-#search-box {
+.search-box {
   background-color: white;
   position: fixed;
   top: 6em;
+  height: 7em;
   font-size: 1em;
   font-weight: 800;
-  width: 80%;
+  left: 1em;
+  right: 1em;
+  overflow-wrap: break-word;
+}
+
+#w9waddress {
+  margin: 0.2em;
+  font-size: 1em;
+
+}
+
+#wholist { 
+  overflow:hidden;
+  list-style-type:none;
+  margin: 0;
+  display: inline;
+} 
+
+.wholistwho { margin:0; float:left; width:auto; }
+
+#slashessb, #whoscontainer {
+  margin: 0em;
+  display: inline;
+  float:left;
+  padding-top: 0.5em;
+}
+
+#slashessb {
+  color:#c21a11;
+  padding-left: 0.5em;
+
+}
+
+#whoscontainer{
+  color:#003b6f;
+  padding-left: 0.5em;
 }
 
 .inputLabelcus {
@@ -69,4 +105,11 @@
 h1 {
   font-weight: 400;
   font-size: 1.5em;
+}
+
+@media only screen and ( min-width: 750px) {
+  .search-box {
+    width: 85%;
+    height: 4em;
+  }
 }
