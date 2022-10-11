@@ -25,7 +25,7 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const RecenterAutomatically = ({lat,lng,setCoords}) => {
+const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel}) => {
   const map = useMap();
    useEffect(() => {
      map.setView([lat, lng]);
@@ -34,8 +34,11 @@ const RecenterAutomatically = ({lat,lng,setCoords}) => {
 
    const mapEvents = useMapEvents({
       click(e) {                                
-          setCoords({lat: e.latlng.lat, lng: e.latlng.lng})             
-      },            
+        setCoords({lat: e.latlng.lat, lng: e.latlng.lng})             
+      },
+      zoomend: () => {
+        setZoomLevel(mapEvents.getZoom());
+    },            
     })
    return null;
  }
@@ -47,6 +50,7 @@ const App = () => {
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
   const [coords,setCoords] = useState({lat: 51.509865, lng: -0.118092})
+  const [zoomLevel,setZoomLevel] = useState(15)
   const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState("")
   const intervalRef = useRef();
@@ -317,7 +321,7 @@ const App = () => {
       </div>
 
       <div id="mapcontainer">
-        <MapContainer center={[coords.lat,coords.lng]} zoom={12} scrollWheelZoom={false} zoomControl={false} >
+        <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >
         <ZoomControl position="bottomleft" />
 
 
@@ -325,17 +329,13 @@ const App = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-           <FeatureGroup pathOptions={{ color: 'purple' }}>
-          <Rectangle stroke={true} bounds={rectangle} />
-
-          </FeatureGroup>
-          <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
+          {zoomLevel > 13 ?
+          <FeatureGroup pathOptions={{ color: 'purple' }}>
+            <Rectangle stroke={true} bounds={rectangle} />
+          </FeatureGroup> :
+          <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
           
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords}/>
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel}/>
         </MapContainer>
       </div>
     </div>
