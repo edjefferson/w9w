@@ -10,6 +10,11 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+import ReactGA from "react-ga4";
+
+const { REACT_APP_GA_TAG } = process.env;
+
+ReactGA.initialize(REACT_APP_GA_TAG);
 
 
 let DefaultIcon = L.icon({
@@ -46,7 +51,9 @@ const App = () => {
   const [value,setValue] = useState("")
   const intervalRef = useRef();
 
-
+  useEffect(() => {
+    ReactGA.send("pageview");
+  }, []);
 
   
   const wholist = [
@@ -260,6 +267,9 @@ const App = () => {
       <div id="search-box"><Autocomplete
         disablePortal
         id="autocomplete-box"
+        noOptionsText={`Search for any place or what9whos address
+        e.g. Ianto Jones Shrine\
+        /////////Smith.Cushing.Tennant.Capaldi.CBaker.Tennant.Gatwa.Capaldi.Smith`}
         sx ={{fontFamily: "Source Sans Pro"}}
         getOptionLabel={(option) =>
           typeof option === 'string' ? option : option.label

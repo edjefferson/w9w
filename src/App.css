@@ -19,7 +19,7 @@
 
 #title {
   width: 100%;
-  background-color: green;
+  background-color: #c21a11;
   color: white;
   position: fixed;
   top:0;
@@ -31,7 +31,8 @@
 
 #placeLabel {
   height: 1.6em;
-  width: 1em;
+  padding-left: 0.5em;
+  padding-top: 0.25em;
 }
 #search-box {
   background-color: white;
@@ -44,7 +45,7 @@
 
 .inputLabelcus {
   font-family: 'Source Sans Pro', sans-serif;
-  font-size: 1.8em;
+  font-size: 1.8m;
 }
 #autocomplete-box {
   width: 100%;
@@ -57,7 +58,7 @@
   font-weight: 500;
   display: inline-block;
 
-  background-color: blue;
+  background-color: #003b6f;
   padding: 0.5em;
   padding-top: 0.25em;
   padding-bottom: 0.4em;
