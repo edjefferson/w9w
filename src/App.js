@@ -6,7 +6,8 @@ import TextField from '@mui/material/TextField';
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
-
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import CloseIcon from '@mui/icons-material/Close';
 
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, FeatureGroup, useMap, ZoomControl, useMapEvents} from 'react-leaflet'
@@ -29,16 +30,18 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel}) => {
+const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel,setInputState}) => {
   const map = useMap();
    useEffect(() => {
      map.setView([lat, lng]);
+
    }, [lat, lng]);
 
 
    const mapEvents = useMapEvents({
       click(e) {                                
-        setCoords({lat: e.latlng.lat, lng: e.latlng.lng})             
+        setCoords({lat: e.latlng.lat, lng: e.latlng.lng})  
+        setInputState(0)           
       },
       zoomend: () => {
         setZoomLevel(mapEvents.getZoom());
@@ -58,9 +61,11 @@ const App = () => {
   const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState([])
   const [copyState,setCopyState] = useState(0)
+  const [inputState,setInputState] = useState(0)
   const intervalRef = useRef();
 
   const copyRef = useRef();
+  const inputRef = useRef();
 
   useEffect(() => {
     ReactGA.send("pageview");
@@ -218,32 +223,39 @@ const App = () => {
     setValue(getEncodedWhos(coords.lat,coords.lng))
   },[])
 
+  const onInputChange = (e) => {
+    console.log(e.target.value)
+    setInputValue(e.target.value)
+  }
+
   useEffect(()=> {
     clearTimeout(intervalRef.current)
     
     if (inputValue.length > 0 && inputValue.startsWith("/") && inputValue.includes(".")) {
       let whostring = inputValue.replace(/(\/+)/,"/").split("/")[1]
-      let whos = whostring.split(".").map(w => w.toLowerCase())
+      let whos = whostring.trim().split(".").map(w => w.toLowerCase())
       let downcased_whos = wholist.map(w => w.toLowerCase())
       let who_check = true
 
       whos.forEach(w => {if(downcased_whos.indexOf(w) < 0) who_check = false })
       if (whos.length === 9 && who_check) {
         let [lat,lng] = decode_whos(whos,downcased_whos)
-        setCoords({lat: lat, lng: lng})
 
+        setOptions([{label: inputValue, key: 1, lat: lat, lng: lng}])
+        
       } else {
         console.log("error")
       }
     } else {
       setOptions([])
+      console.log("ape")
       intervalRef.current = setTimeout(() => {
         fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(inputValue)}&format=json`,
         {method: "GET"})
           .then((response) => response.json())
           .then((data) => {
             let newOptions = data.map((d)=> { return {label: d.display_name, key: d.place_id, lat: d.lat, lng: d.lon, id: d.place_id}})
-
+            console.log(newOptions)
             setOptions(newOptions)
           }
           )},500)
@@ -261,13 +273,23 @@ const App = () => {
 
   const formatw9w = (value) => {
     
-    return <ul id="wholist">{value.map((w,i) => <li className="wholistwho">{i === value.length -1 ? w :  w + "."}</li>)}</ul>
+    return <ul className="wholist">{value.map((w,i) => <li key={i} className="wholistwho">{i === value.length -1 ? w :  w + "."}</li>)}</ul>
   }
 
   const copyContent = () => {
     navigator.clipboard.writeText("/////////" + value.join("."))
     setCopyState(1)
   }
+
+  const inputOn = () => {
+    setInputValue("")
+    setInputState(1)
+  }
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+
+  },[inputState,inputRef])
 
   useEffect(() => {
     if (copyState) {
@@ -287,60 +309,32 @@ const App = () => {
       <div id="search-box" className="search-box">
         
 
-       
-        <Autocomplete
-        disablePortal
-        id="autocomplete-box"
-        noOptionsText={`Search for any place or what9whos address
-        e.g. Ianto Jones Shrine\
-        /////////Smith.Cushing.Tennant.Capaldi.CBaker.Tennant.Gatwa.Capaldi.Smith`}
-        sx ={{fontFamily: "Source Sans Pro", display: "none"}}
-        getOptionLabel={(option) =>
-          typeof option === 'string' ? option : option.label
-        }
-        options={options}
-        value={value}
-        filterOptions={(x) => x}
-   
-        renderInput={(params) => <TextField
-          
-  
-        id="inputText"
-        {...params}
-        sx ={{fontFamily: "Source Sans Pro"}}
-        InputProps={{...params.InputProps, sx:{fontFamily: "Source Sans Pro !important", fontSize: "1.1em"}}}
-        
-        InputLabelProps={{...params.InputLabelProps, sx:{fontFamily: "Source Sans Pro !important", fontSize: "1.1em"}}}
-
      
-        
 
-        
-        
-        label="Place"  />}
-
-        renderOption={(props2, option) => (
-          <><li {...props2} style={{fontFamily: "Source Sans Pro !important", fontSize: "1.2em"}}>{option.label}</li></>
-        )}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-        }}
-
-        onChange={(event, newValue) => {
-    
-          setCoords({lat: parseFloat(newValue.lat), lng: parseFloat(newValue.lng)})
-
-          setPlaceLabel(newValue.label)
-
-
-        }}
-
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-      />
-
-      <div id="placeLabel">{placeLabel}</div>
       </div>
-      <div id="search-box-new" className="search-box"><div id="w9waddress"><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon color="action"/></div></div></div>
+      {inputState ? <><div id="input-box" className="search-box">
+      <div id="backicon"><ArrowBackIosIcon onClick={() => setInputState(0)} color="action"/>   </div>
+     
+        <input ref={inputRef} onChange={onInputChange} placeholder="Search"></input>
+        <div id="closeicon"><CloseIcon onClick={() => setInputState(0)} color="action"/>   </div>
+      </div>
+      
+      {options.length > 0 ? 
+      <div id="infobox">
+        {options.map((o,i)=> <div className="searchoption" key={i} onClick={() => {
+          setCoords({lat: parseFloat(o.lat), lng: parseFloat(o.lng)})
+          setInputState(0)
+}}>{o.label}</div>)}
+        </div>
+        :
+      <div id="infobox">
+
+        <p>Search for any place or what9whos address</p>
+      <p>e.g. Ianto Jones Shrine</p>
+      <ul className="wholist"><li>///////// Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.Capaldi.</li><li>Smith</li></ul></div>
+}
+      </>:
+      <div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>}
 
       <div id="mapcontainer">
         <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >
@@ -357,7 +351,7 @@ const App = () => {
           </FeatureGroup> :
           <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
           
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel}/>
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel} setInputState={setInputState}/>
         </MapContainer>
       </div>
     </div>
