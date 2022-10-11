@@ -36,6 +36,7 @@
 }
 .search-box {
   background-color: white;
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.25);
   position: fixed;
   top: 6em;
   height: 7em;
@@ -49,8 +50,45 @@
 #w9waddress {
   margin: 0.2em;
   font-size: 1em;
+  position: relative;
+  right: 15em;
+  left: 0em;
+  width: 80%;
+}
+
+#buttons {
+  position: absolute;
+  right: 0.5em;
+  top: 0.5em;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#buttons div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  bottom: 0;
+  height: 2em;
+  border-radius: 50%;
+    width: 2em;
+    height: 2em; 
+    margin-left: 0.5em;
+}
+
+#buttons span {
+  padding-top: 0.5em;
+  color: #282828;
+}
+
+#buttons div:hover{
+  background-color: lightgrey;
 
 }
+
+
 
 #wholist { 
   overflow:hidden;
@@ -77,6 +115,7 @@
 #whoscontainer{
   color:#003b6f;
   padding-left: 0.5em;
+  right: 8em;
 }
 
 .inputLabelcus {
@@ -107,9 +146,32 @@ h1 {
   font-size: 1.5em;
 }
 
+
+
 @media only screen and ( min-width: 750px) {
+  .search-box {
+    width: 95%;
+    height: 6em;
+  }
+
+  #w9waddress {
+
+    width: 90%;
+  }
+}
+
+@media only screen and ( min-width: 900px) {
   .search-box {
     width: 85%;
     height: 4em;
+  }
+
+
+}
+
+@media only screen and ( max-width: 300px) {
+  .search-box {
+   
+    height: auto;
   }
 }

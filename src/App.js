@@ -4,6 +4,10 @@ import './App.css';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SearchIcon from '@mui/icons-material/Search';
+
+
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, FeatureGroup, useMap, ZoomControl, useMapEvents} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
@@ -53,7 +57,10 @@ const App = () => {
   const [zoomLevel,setZoomLevel] = useState(15)
   const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState([])
+  const [copyState,setCopyState] = useState(0)
   const intervalRef = useRef();
+
+  const copyRef = useRef();
 
   useEffect(() => {
     ReactGA.send("pageview");
@@ -257,6 +264,21 @@ const App = () => {
     return <ul id="wholist">{value.map((w,i) => <li className="wholistwho">{i === value.length -1 ? w :  w + "."}</li>)}</ul>
   }
 
+  const copyContent = () => {
+    navigator.clipboard.writeText("/////////" + value.join("."))
+    setCopyState(1)
+  }
+
+  useEffect(() => {
+    if (copyState) {
+      copyRef.current = setTimeout(() => setCopyState(0), 500);
+    }
+    return () => {
+      
+      clearTimeout(copyRef.current);
+    }
+  }, [copyState])
+
   return (
     <div className="App">
       <div id="title"><h1><span id="slashes">{"/////////"}</span>what9whos</h1></div>
@@ -318,7 +340,7 @@ const App = () => {
 
       <div id="placeLabel">{placeLabel}</div>
       </div>
-      <div id="search-box-new" className="search-box"><div id="w9waddress"><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div></div>
+      <div id="search-box-new" className="search-box"><div id="w9waddress"><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon color="action"/></div></div></div>
 
       <div id="mapcontainer">
         <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >
