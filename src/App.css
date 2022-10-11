@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap');
 
+
 #aboutbox {
   z-index: 100;
   position: absolute;
@@ -87,7 +88,7 @@
   margin-bottom: 0;
 }
 
-#infobox {
+#infobox,#sharebox{
   background-color: #f2f4f5;
   color: grey;
   box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.25);
@@ -109,6 +110,36 @@
   right: 1em;
   overflow-wrap: break-word;
 }
+
+#sharebox > div {
+  flex-direction: row;
+  align-items: center;
+  display: flex;
+
+}
+
+#sharebutton {
+  justify-content: center;
+
+  height: 1.5em;
+
+}
+
+#socialsharebuttons{
+  display: flex;
+  justify-content: space-evenly;
+  width: 60%;
+  padding-left: 20%;
+  padding-top: 0.5em;
+}
+
+#sharebox {
+  background-color: #003b6f;
+  
+  color: white;
+  
+}
+
 #infobox p {
   margin-bottom: 0.5em;
   margin-top: 0em;
@@ -247,11 +278,34 @@ h1,h2 {
 
 }
 
+#sharebumf {
+  margin-top: 1em;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+#sharebumf svg, #sharebumf span {
+  padding-right: 1em;
+  margin: 0;
+}
+
+
+
+#shareurl{
+  width: 70%;
+  background-color: lightblue;
+  margin-left: 1em;
+  color: #003b6f
+}
+
 @media only screen and ( min-width: 400px) {
   .search-box {
     height: 7em;
   }
-  #infobox {
+  #infobox,#sharebox {
     top: 13em;
 
   }
@@ -262,7 +316,7 @@ h1,h2 {
     width: 95%;
     height: 6em;
   }
-  #infobox {
+  #infobox,#sharebox {
     width: 95%;
     top: 12em;
 
@@ -280,7 +334,7 @@ h1,h2 {
     height: 4em;
   }
 
-  #infobox {
+  #infobox,#sharebox {
     width: 85%;
     top: 10em;
 
@@ -295,7 +349,7 @@ h1,h2 {
     height: 10em;
   }
 
-  #infobox {
+  #infobox,#sharebox {
     top: 16em;
 
   }

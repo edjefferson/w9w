@@ -6,6 +6,23 @@ import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ShareIcon from '@mui/icons-material/Share';
+
+import LocateControl from 'react-leaflet-locate-control'
+
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+} from "react-share";
+
+import {
+  EmailIcon,
+  FacebookIcon,
+  LinkedinIcon,
+  TwitterIcon,
+} from "react-share";
 
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, Rectangle, FeatureGroup, useMap, ZoomControl, useMapEvents} from 'react-leaflet'
@@ -28,18 +45,21 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel,setInputState}) => {
+const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel,setInputState,setShare}) => {
   const map = useMap();
    useEffect(() => {
      map.setView([lat, lng]);
 
    }, [lat, lng]);
 
+   
+
 
    const mapEvents = useMapEvents({
       click(e) {                                
         setCoords({lat: e.latlng.lat, lng: e.latlng.lng})  
-        setInputState(0)           
+        setInputState(0)  
+        setShare(0)         
       },
       zoomend: () => {
         setZoomLevel(mapEvents.getZoom());
@@ -59,16 +79,43 @@ const App = () => {
   const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState([])
   const [aboutBox,setAboutBox] = useState(0)
+  const [share,setShare] = useState(0)
+
   const [copyState,setCopyState] = useState(0)
+  const [copyURLState,setCopyURLState] = useState(0)
+
   const [inputState,setInputState] = useState(0)
   const intervalRef = useRef();
 
   const copyRef = useRef();
+  const copyURLRef = useRef();
+
   const inputRef = useRef();
 
+ 
   useEffect(() => {
     ReactGA.send("pageview");
+    const searchParams = new URLSearchParams(document.location.search)
+    const query =  searchParams.get("q")
+    console.log(query)
+    if (query && query.length > 0 && query.includes(".")) {
+
+      let whos = query.trim().split(".").map(w => w.toLowerCase())
+      let downcased_whos = wholist.map(w => w.toLowerCase())
+      let who_check = true
+  
+      whos.forEach(w => {if(downcased_whos.indexOf(w) < 0) who_check = false })
+      if (whos.length === 9 && who_check) {
+        let [lat,lng] = decode_whos(whos,downcased_whos)
+  
+        setCoords({lat: lat, lng: lng})
+        
+      } else {
+        console.log("error")
+      }
+    }
   }, []);
+
 
   
   const wholist = [
@@ -223,7 +270,6 @@ const App = () => {
   },[])
 
   const onInputChange = (e) => {
-    console.log(e.target.value)
     setInputValue(e.target.value)
   }
 
@@ -247,14 +293,12 @@ const App = () => {
       }
     } else {
       setOptions([])
-      console.log("ape")
       intervalRef.current = setTimeout(() => {
         fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(inputValue)}&format=json`,
         {method: "GET"})
           .then((response) => response.json())
           .then((data) => {
             let newOptions = data.map((d)=> { return {label: d.display_name, key: d.place_id, lat: d.lat, lng: d.lon, id: d.place_id}})
-            console.log(newOptions)
             setOptions(newOptions)
           }
           )},500)
@@ -266,7 +310,13 @@ const App = () => {
   },[inputValue])
 
   useEffect(() => {
-    setValue(getEncodedWhos(coords.lat,coords.lng))
+    let encodedWhos = getEncodedWhos(coords.lat,coords.lng)
+    setValue(encodedWhos)
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", encodedWhos.join("."));
+
+    window.history.pushState(null, '', url);
   }, [coords])
 
 
@@ -280,9 +330,15 @@ const App = () => {
     setCopyState(1)
   }
 
+  const copyURLContent = () => {
+    navigator.clipboard.writeText("https://edjefferson.com/w9w?q=" + value.join("."))
+    setCopyURLState(1)
+  }
+
   const inputOn = () => {
     setInputValue("")
     setInputState(1)
+    setShare(0)
   }
 
   useEffect(() => {
@@ -299,6 +355,18 @@ const App = () => {
       clearTimeout(copyRef.current);
     }
   }, [copyState])
+
+  useEffect(() => {
+    if (copyURLState) {
+      copyURLRef.current = setTimeout(() => setCopyURLState(0), 500);
+    }
+    return () => {
+      
+      clearTimeout(copyURLRef.current);
+    }
+  }, [copyURLState])
+
+
 
   return (
     <div className="App">
@@ -317,17 +385,15 @@ const App = () => {
         
         </div> : ""}
 
-      <div id="search-box" className="search-box">
-        
 
-     
-
-      </div>
       {inputState ? <><div id="input-box" className="search-box">
-      <div id="backicon"><ArrowBackIosIcon onClick={() => setInputState(0)} color="action"/>   </div>
+      <div id="backicon"><ArrowBackIosIcon onClick={() => {setInputState(0)
+      setShare(0)}
+      } color="action"/>   </div>
      
         <input ref={inputRef} onChange={onInputChange} placeholder="Search"></input>
-        <div id="closeicon"><CloseIcon onClick={() => setInputState(0)} color="action"/>   </div>
+        <div id="closeicon"><CloseIcon onClick={() => {setInputState(0)
+      setShare(0)}} color="action"/>   </div>
       </div>
       
       {options.length > 0 ? 
@@ -335,6 +401,7 @@ const App = () => {
         {options.map((o,i)=> <div className="searchoption" key={i} onClick={() => {
           setCoords({lat: parseFloat(o.lat), lng: parseFloat(o.lng)})
           setInputState(0)
+          setShare(0)
 }}>{o.label}</div>)}
         </div>
         :
@@ -342,13 +409,43 @@ const App = () => {
 
         <p>Search for any place or what9whos address</p>
       <p>e.g. Ianto Jones Shrine</p>
-      <ul className="wholist"><li>///////// Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.Capaldi.</li><li>Smith</li></ul></div>
+      <ul className="wholist"><li>{"/////////"} Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.Capaldi.</li><li>Smith</li></ul></div>
 }
       </>:
-      <div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">/////////</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>}
+      <><div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">{"/////////"}</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>
+      <div id="sharebox">
+        <div id="sharebutton" onClick={() => setShare(1)}>
+      <ShareIcon style={{color: "white", paddingRight: "0.5em", fontSize: "1.2em"}} />
+        <span>SHARE</span>
+        </div>
+       
+        {share ? <> <div id="sharebumf">
+          <div id="shareurl">https://edjefferson.com/w9w/?q={value.join(".")}</div>{copyURLState ? <span>Copied</span> : <ContentCopyIcon style={{color: "white"}} onClick={copyURLContent} />}</div>
+          <div id="socialsharebuttons">
+            <TwitterShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+            <TwitterIcon size={32} round={true} />
+              </TwitterShareButton>
+              <FacebookShareButton quote={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+            <FacebookIcon size={32} round={true} />
+              </FacebookShareButton>
+              <LinkedinShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+            <LinkedinIcon size={32} round={true} />
+              </LinkedinShareButton>
+
+              <EmailShareButton body={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+            <EmailIcon size={32} round={true} />
+              </EmailShareButton>
+            </div></>
+          
+          : ""}
+        
+      </div>
+      
+      </>}
 
       <div id="mapcontainer">
         <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >
+
         <ZoomControl position="bottomleft" />
 
 
@@ -362,7 +459,7 @@ const App = () => {
           </FeatureGroup> :
           <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
           
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel} setInputState={setInputState}/>
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare}/>
         </MapContainer>
       </div>
     </div>
