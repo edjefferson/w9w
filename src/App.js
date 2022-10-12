@@ -54,7 +54,7 @@ const App = () => {
   let defaultLoc = {lat: 51.50315489517607, lng: -0.22844554064247316}
 
   const searchParams = new URLSearchParams(document.location.search)
-  const [query,setQuery] =  useState(searchParams.get("who"))
+  const [query,setQuery] =  useState(searchParams.get("whos"))
 
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
