@@ -461,7 +461,7 @@ const App = () => {
 
         <p>Search for any place or what9whos address</p>
       <p>e.g. Ianto Jones Shrine</p>
-      <ul className="wholist"><a href="/?whos=Smith.Cushing.Tennant.Capaldi.CBaker.Tennant.Gatwa.Capaldi.Smith"><li>{"/////////"} Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.</li><li>Capaldi.</li><li>Smith</li></a></ul></div>
+      <ul className="wholist"><a href="/w9w/?whos=Smith.Cushing.Tennant.Capaldi.CBaker.Tennant.Gatwa.Capaldi.Smith"><li>{"/////////"} Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.</li><li>Capaldi.</li><li>Smith</li></a></ul></div>
 }
       </>:
       <><div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">{"/////////"}</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>
