@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-
+import RecenterAutomatically from './recenterAutomatically';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -8,7 +8,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ShareIcon from '@mui/icons-material/Share';
 
-import LocateControl from 'react-leaflet-locate-control'
 
 import {
   EmailShareButton,
@@ -25,7 +24,7 @@ import {
 } from "react-share";
 
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Popup, Rectangle, FeatureGroup, useMap, ZoomControl, useMapEvents} from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Polyline, Rectangle, FeatureGroup, ZoomControl} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -45,38 +44,21 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const RecenterAutomatically = ({lat,lng,setCoords,setZoomLevel,setInputState,setShare}) => {
-  const map = useMap();
-   useEffect(() => {
-     map.setView([lat, lng]);
 
-   }, [lat, lng]);
-
-   
-
-
-   const mapEvents = useMapEvents({
-      click(e) {                                
-        setCoords({lat: e.latlng.lat, lng: e.latlng.lng})  
-        setInputState(0)  
-        setShare(0)         
-      },
-      zoomend: () => {
-        setZoomLevel(mapEvents.getZoom());
-    },            
-    })
-   return null;
- }
 
 
 
 const App = () => {
+  let defaultLoc = {lat: 51.50315489517607, lng: -0.22844554064247316}
+
+  const searchParams = new URLSearchParams(document.location.search)
+  const [query,setQuery] =  useState(searchParams.get("q"))
 
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
-  const [coords,setCoords] = useState({lat: 51.509865, lng: -0.118092})
+  const [coords,setCoords] = useState(defaultLoc)
+  const [preciseLocation,setPreciseLocation] = useState(defaultLoc)
   const [zoomLevel,setZoomLevel] = useState(15)
-  const [placeLabel,setPlaceLabel] = useState("London")
   const [value,setValue] = useState([])
   const [aboutBox,setAboutBox] = useState(0)
   const [share,setShare] = useState(0)
@@ -92,32 +74,11 @@ const App = () => {
 
   const inputRef = useRef();
 
- 
-  useEffect(() => {
-    ReactGA.send("pageview");
-    const searchParams = new URLSearchParams(document.location.search)
-    const query =  searchParams.get("q")
-    console.log(query)
-    if (query && query.length > 0 && query.includes(".")) {
-
-      let whos = query.trim().split(".").map(w => w.toLowerCase())
-      let downcased_whos = wholist.map(w => w.toLowerCase())
-      let who_check = true
-  
-      whos.forEach(w => {if(downcased_whos.indexOf(w) < 0) who_check = false })
-      if (whos.length === 9 && who_check) {
-        let [lat,lng] = decode_whos(whos,downcased_whos)
-  
-        setCoords({lat: lat, lng: lng})
-        
-      } else {
-        console.log("error")
-      }
-    }
-  }, []);
+  const [rectangle,setRectangle] = useState([])
+  const [hlines,setHlines] = useState([])
+  const [vlines,setVlines] = useState([])
 
 
-  
   const wholist = [
     "Hartnell",
     "Troughton",
@@ -145,16 +106,68 @@ const App = () => {
     [12,13,14,15]
   ]
 
-  const latSize = 180.0/(Math.pow(wholist.length-1,4))
-  const lngSize = 360.0/(Math.pow(wholist.length-1,4))
+  const latSize = 180.0/(Math.pow(wholist.length,4))
+  const lngSize = 360.0/(Math.pow(wholist.length,4))
 
+
+  const convertPreciseToNearest = (coords) => {
+    console.log(coords)
+    let pcoords = {lat: Math.floor(4*((coords.lat+180/2)/latSize))*latSize/4-180/2,
+    lng: Math.floor(4*((coords.lng+360/2)/lngSize))*lngSize/4-360/2 }
+
+    console.log(pcoords)
+    return pcoords
+     
+  }
+
+
+  useEffect(() => {
+
+    let newCoords = convertPreciseToNearest(preciseLocation)
+    setCoords(newCoords)
+
+  },[preciseLocation])
+
+  
+  const checkQueryParams = () => {
+    
+    if (query && query.length > 0 && query.includes(".")) {
+      let whos = query.trim().split(".").map(w => w.toLowerCase())
+      let downcased_whos = wholist.map(w => w.toLowerCase())
+      let who_check = true
+      whos.forEach(w => {if(downcased_whos.indexOf(w) < 0) who_check = false })
+      if (whos.length === 9 && who_check) {
+        let [lat,lng] = decode_whos(whos,downcased_whos)
+        console.log(lat,lng)
+
+        return {lat: lat, lng: lng}
+        
+      } else {
+        console.log("nah")
+        return defaultLoc
+      }
+    } else {
+      console.log("nah")
+
+      return defaultLoc
+      
+
+    }
+  }
+
+  useEffect(() => {
+    ReactGA.send("pageview");
+    setCoords(c => checkQueryParams())
+    
+  }, []);
+  
 
   const convert = (x_or_y,mode,accuracy,how_many_whos) => {
 
 
     let max = mode === "lat" ? 180 : 360
 
-    let last_square = how_many_whos * (max/2 +x_or_y)/max
+    let last_square = parseFloat(how_many_whos) * (max/2 +x_or_y)/max
 
 
 
@@ -165,6 +178,7 @@ const App = () => {
       squares.push(Math.floor(last_square))
       y+=1
     }
+    
 
     let x = - max/2
     squares.forEach( (f,i) => {
@@ -173,18 +187,20 @@ const App = () => {
     })
     return [squares,x]
   }
- 
+
   const get_final_grid = (final_lat,final_lng,lat,lng) => {
     let y = Math.floor(4*(lat - final_lat)/latSize)
     let x = Math.floor(4*(lng - final_lng)/lngSize)
-  
-
+    console.log(y,x)
+    x = x >= 4 ? 0 : x
+    y = y >= 4 ? 0 : y
     return finalgrid[x][y]
   }
 
   const reverse_final_grid = (no) => {
     let x = finalgrid.findIndex(g => g.includes(no))
     let y = finalgrid[x].indexOf(no)
+    console.log(x,y)
     return [x,y]
   }
 
@@ -205,18 +221,22 @@ const App = () => {
     unrotated.push(lastNumber)
     return unrotated
   }
+ 
 
-  const get_whos = (lat,lng,accuracy,wholist) => {
+  const get_whos = (lat,lng,accuracy) => {
+    
     let [ys, final_lat] = convert(lat,"lat",accuracy,wholist.length)
     let [xs, final_lng] = convert(lng,"lng",accuracy,wholist.length)
     let final_grid_doc = get_final_grid(final_lat,final_lng,lat,lng)
+
+
     let numbers = [...Array(accuracy).keys()].map((x => [xs[x],ys[x]])).flat()
     numbers.push(final_grid_doc)
 
     let rotatedNumbers = rotateNumbers(numbers)
-    return rotatedNumbers.map(n => wholist[n])
+ 
+    return [rotatedNumbers.map(n => wholist[n]),final_lat,final_lng]
   }
-
 
   const deconvert = (squares,mode,how_many_whos) => {
     let max = mode === "lat" ? 180 : 360
@@ -224,7 +244,7 @@ const App = () => {
     
     let x = - max/2
     squares.forEach( (f,i) => {
-      x +=  f/parseFloat(how_many_whos)** (i+1) * max
+      x +=  f/parseFloat(how_many_whos** (i+1)) * max
     })
     return x
   }
@@ -234,40 +254,54 @@ const App = () => {
     let xs = []
     let ys = []
     let who_nums = whos.map(w => wholist.indexOf(w))
-    let unrotated_whos = unrotateNumbers(who_nums)
-    let last_who = unrotated_whos.pop()
-    let final_grid_pos = reverse_final_grid(last_who)
     
+    let unrotated_whos = unrotateNumbers(who_nums)
+    
+    let last_who = unrotated_whos.pop()
+
     unrotated_whos.forEach((w,i) =>  i % 2 !== 0 ? ys.push(w) : xs.push(w))
+
+    let final_grid_pos = reverse_final_grid(last_who)
+
     let lat = deconvert(ys,"lat",wholist.length) + final_grid_pos[1] * latSize/4
     let lng = deconvert(xs,"lng",wholist.length) + final_grid_pos[0] * lngSize/4
-
-
+    console.log("bring")
     return [lat,lng]
   }
 
+  useEffect(() => {
+    let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8)
 
 
+    setValue(encodedWhos)
 
-  const decoded = [coords.lat,coords.lng]
-  let rectangle = [
-    decoded,
-    [decoded[0]+latSize/4,decoded[1]+ lngSize/4],
-  ]
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", encodedWhos.join("."));
+    setQuery(encodedWhos.join("."))
+    window.history.pushState(null, '', url);
 
+    setRectangle([
+      [coords.lat+latSize/4,coords.lng+lngSize/4],
+      [coords.lat,coords.lng],
+    ])
+    
+    let gridSize = 40
+    setHlines([...Array(gridSize).keys()].map(x => [
+      [coords.lat+ latSize/4 * (x-gridSize/2.0), coords.lng-1], [coords.lat + latSize/4 * (x-gridSize/2.0), coords.lng+1]
+    ]))
+    setVlines([...Array(gridSize).keys()].map(x => [
+      [coords.lat-1, coords.lng + lngSize/4 * (x-gridSize/2.0)], [coords.lat + 1, coords.lng+ lngSize/4 * (x-gridSize/2.0)]
+    ]))
+  },[coords])
 
 
 
 
   const getEncodedWhos = (lat,lng) => {
-    return get_whos(coords.lat,coords.lng,4,wholist)
+    return get_whos(lat,lng,4)[0]
   }
 
-  useEffect(() => {
 
-    setPlaceLabel("London, Greater London, England, United Kingdom")
-    setValue(getEncodedWhos(coords.lat,coords.lng))
-  },[])
 
   const onInputChange = (e) => {
     setInputValue(e.target.value)
@@ -286,7 +320,7 @@ const App = () => {
       if (whos.length === 9 && who_check) {
         let [lat,lng] = decode_whos(whos,downcased_whos)
 
-        setOptions([{label: inputValue, key: 1, lat: lat, lng: lng}])
+        setOptions([{label: inputValue, key: 1, lat: lat + latSize/8, lng: lng + lngSize/8}])
         
       } else {
         console.log("error")
@@ -298,7 +332,10 @@ const App = () => {
         {method: "GET"})
           .then((response) => response.json())
           .then((data) => {
-            let newOptions = data.map((d)=> { return {label: d.display_name, key: d.place_id, lat: d.lat, lng: d.lon, id: d.place_id}})
+            let newOptions = data.map((d)=> { 
+       
+
+              return {label: d.display_name, key: d.place_id, lat: parseFloat(d.lat), lng: parseFloat(d.lon), id: d.place_id}})
             setOptions(newOptions)
           }
           )},500)
@@ -309,15 +346,6 @@ const App = () => {
     
   },[inputValue])
 
-  useEffect(() => {
-    let encodedWhos = getEncodedWhos(coords.lat,coords.lng)
-    setValue(encodedWhos)
-
-    const url = new URL(window.location.href);
-    url.searchParams.set("q", encodedWhos.join("."));
-
-    window.history.pushState(null, '', url);
-  }, [coords])
 
 
   const formatw9w = (value) => {
@@ -375,11 +403,14 @@ const App = () => {
         <div id="abtitle"><h2><span id="slashes">{"/////////"}</span>what9whos - about</h2> <CloseIcon onClick={()=> setAboutBox(0)} style={{color: "white"}} /></div>
         <div id="about-content">
           <h3>The most Doctor Who-based way to talk about location</h3>
-          <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing 9 of the names of actors who have played TV (and film's) Doctor Who?</p>
+          <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing the names of 9 actors who have played TV's (and film's) Doctor Who?</p>
           <p>We had, for some reason, so that's why we created what9whos.</p>
+          <p>what9whos includes all 14 'main' Doctor Whos from Hartnell to Gatwa, plus John Hurt, Jo Martin and Peter Cushing. If you do not accept this as canon you are welcome to build your own Doctor Who-based geolocation system.</p>
           <h4>Disclaimer</h4>
           <p>We would not recommend using what9whos in any kind of emergency situation (or at all).</p>
           <p>Doctor Who is the property of the BBC who have absolutely nothing to do with what9whos, so please don't blame them.</p>
+          <p>As far as we know this only works on planet Earth.</p>
+          <p>We promise not to send you a legal threat if you attempt to reverse engineer any of our stupid algorithms.</p>
           <p><a id="sitelink" href="https://edjefferson.com">edjefferson.com</a></p>
           </div>
         
@@ -399,7 +430,8 @@ const App = () => {
       {options.length > 0 ? 
       <div id="infobox">
         {options.map((o,i)=> <div className="searchoption" key={i} onClick={() => {
-          setCoords({lat: parseFloat(o.lat), lng: parseFloat(o.lng)})
+
+          setPreciseLocation({lat: o.lat, lng: o.lng})
           setInputState(0)
           setShare(0)
 }}>{o.label}</div>)}
@@ -442,9 +474,8 @@ const App = () => {
       </div>
       
       </>}
-
       <div id="mapcontainer">
-        <MapContainer center={[coords.lat,coords.lng]} zoom={15} scrollWheelZoom={false} zoomControl={false} >
+        <MapContainer center={[coords.lat+ latSize/4,coords.lng+lngSize/8]} zoom={16} scrollWheelZoom={false} zoomControl={false} >
 
         <ZoomControl position="bottomleft" />
 
@@ -454,12 +485,20 @@ const App = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {zoomLevel > 13 ?
+          <>
           <FeatureGroup pathOptions={{ color: 'purple' }}>
-            <Rectangle stroke={true} bounds={rectangle} />
-          </FeatureGroup> :
-          <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
+            {rectangle[0] ? <Rectangle stroke={true} bounds={rectangle} /> : ""}
+          </FeatureGroup> 
           
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setCoords={setCoords} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare}/>
+          <FeatureGroup pathOptions={{ color: 'grey' }}>
+            {hlines.length ? hlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}
+            {vlines.length ? vlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}
+            
+          </FeatureGroup>
+          </>:
+          <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
+
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} get_whos={get_whos} lngSize={lngSize} latSize={latSize}/>
         </MapContainer>
       </div>
     </div>
