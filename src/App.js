@@ -54,7 +54,7 @@ const App = () => {
   let defaultLoc = {lat: 51.50315489517607, lng: -0.22844554064247316}
 
   const searchParams = new URLSearchParams(document.location.search)
-  const [query,setQuery] =  useState(searchParams.get("q"))
+  const [query,setQuery] =  useState(searchParams.get("who"))
 
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
@@ -276,7 +276,7 @@ const App = () => {
 
       setValue(encodedWhos)
       const url = new URL(window.location.href);
-      url.searchParams.set("q", encodedWhos.join("."));
+      url.searchParams.set("whos", encodedWhos.join("."));
       setQuery(encodedWhos.join("."))
       window.history.pushState(null, '', url);
 
@@ -369,7 +369,7 @@ const App = () => {
   }
 
   const copyURLContent = () => {
-    navigator.clipboard.writeText("https://edjefferson.com/w9w?q=" + value.join("."))
+    navigator.clipboard.writeText("https://edjefferson.com/w9w?whos=" + value.join("."))
     setCopyURLState(1)
   }
 
@@ -471,19 +471,19 @@ const App = () => {
         </div>
        
         {share ? <> <div id="sharebumf">
-          <div id="shareurl">https://edjefferson.com/w9w/?q={value.join(".")}</div>{copyURLState ? <span>Copied</span> : <ContentCopyIcon style={{color: "white"}} onClick={copyURLContent} />}</div>
+          <div id="shareurl">https://edjefferson.com/w9w/?whos={value.join(".")}</div>{copyURLState ? <span>Copied</span> : <ContentCopyIcon style={{color: "white"}} onClick={copyURLContent} />}</div>
           <div id="socialsharebuttons">
-            <TwitterShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+            <TwitterShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?whos=${value.join(".")}`}>
             <TwitterIcon size={32} round={true} />
               </TwitterShareButton>
-              <FacebookShareButton quote={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+              <FacebookShareButton quote={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?whos=${value.join(".")}`}>
             <FacebookIcon size={32} round={true} />
               </FacebookShareButton>
-              <LinkedinShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+              <LinkedinShareButton title={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?whos=${value.join(".")}`}>
             <LinkedinIcon size={32} round={true} />
               </LinkedinShareButton>
 
-              <EmailShareButton body={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?q=${value.join(".")}`}>
+              <EmailShareButton body={`Meet me at /////////${value.join(".")}`} url={`https://edjefferson.com/w9w/?whos=${value.join(".")}`}>
             <EmailIcon size={32} round={true} />
               </EmailShareButton>
             </div></>
