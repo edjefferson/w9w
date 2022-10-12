@@ -430,7 +430,7 @@ const App = () => {
           <p>Doctor Who is the property of the BBC who have absolutely nothing to do with what9whos, so please don't blame them.</p>
           <p>As far as we know this only works on planet Earth.</p>
           <p>We promise not to send you a legal threat if you attempt to reverse engineer any of our stupid algorithms.</p>
-          <p><a id="sitelink" href="https://edjefferson.com">edjefferson.com</a></p>
+          <p><a id="sitelink" href="https://edjefferson.com">edjefferson.com</a> / <a id="sitelink" href="https://twitter.com/edjeff">@edjeff</a></p>
           </div>
         
         </div> : ""}
