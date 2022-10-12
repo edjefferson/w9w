@@ -156,10 +156,8 @@ const App = () => {
   useEffect(() => {
 
     ReactGA.send("pageview");
-    console.log("egg")
 
     let newcoords = checkQueryParams()
-    console.log(newcoords)
     setCoords(c => newcoords)
     setMapCentre(newcoords)
     
@@ -271,7 +269,6 @@ const App = () => {
   }
 
   useEffect(() => {
-    console.log("bacon")
     if (coords) {
       let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8)
 
@@ -291,7 +288,6 @@ const App = () => {
   },[coords])
 
   useEffect(()=> {
-    console.log("sausage")
 
     let gridSize = 60
     if (mapCentre) {
