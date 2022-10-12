@@ -7,6 +7,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ShareIcon from '@mui/icons-material/Share';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 
 
 import {
@@ -24,7 +25,7 @@ import {
 } from "react-share";
 
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Polyline, Rectangle, FeatureGroup, ZoomControl} from 'react-leaflet'
+import { useMap, MapContainer, TileLayer, Marker, Polyline, Rectangle, FeatureGroup, ZoomControl} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -404,7 +405,16 @@ const App = () => {
   }, [copyURLState])
 
 
+  const geoLocate = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setPreciseLocation({lat: position.coords.latitude, lng: position.coords.longitude});
+      });
+    } else {
+      console.log("no geolocation")
+    }
 
+  }
   return (
     <div className="App">
       <div id="title"><h1><span id="slashes">{"/////////"}</span>what9whos</h1> <InfoOutlinedIcon onClick={()=> setAboutBox(1)} style={{color: "white"}} /></div>
@@ -455,7 +465,7 @@ const App = () => {
       </>:
       <><div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">{"/////////"}</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>
       <div id="sharebox">
-        <div id="sharebutton" onClick={() => setShare(1)}>
+        <div id="sharebutton" onClick={() => setShare(share => share ? 0 : 1)}>
       <ShareIcon style={{color: "white", paddingRight: "0.5em", fontSize: "1.2em"}} />
         <span>SHARE</span>
         </div>
@@ -508,10 +518,10 @@ const App = () => {
           </FeatureGroup>
           </>:
           <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
-
           <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} setMapCentre={setMapCentre} lngSize={lngSize} latSize={latSize}/>
         </MapContainer>
       </div> :""}
+      <div id="geolocatebutton" onClick={geoLocate}><MyLocationIcon style={{color: "black"}}/></div>
     </div>
   );
 }
