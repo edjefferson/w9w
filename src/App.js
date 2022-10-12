@@ -49,6 +49,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 
 const App = () => {
+
   let defaultLoc = {lat: 51.50315489517607, lng: -0.22844554064247316}
 
   const searchParams = new URLSearchParams(document.location.search)
@@ -56,10 +57,10 @@ const App = () => {
 
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
-  const [coords,setCoords] = useState(defaultLoc)
-  const [preciseLocation,setPreciseLocation] = useState(defaultLoc)
+  const [coords,setCoords] = useState(0)
+  const [preciseLocation,setPreciseLocation] = useState(0)
   const [zoomLevel,setZoomLevel] = useState(15)
-  const [mapCentre,setMapCentre] = useState(defaultLoc)
+  const [mapCentre,setMapCentre] = useState(0)
   const [value,setValue] = useState([])
   const [aboutBox,setAboutBox] = useState(0)
   const [share,setShare] = useState(0)
@@ -121,9 +122,10 @@ const App = () => {
 
 
   useEffect(() => {
-
-    let newCoords = convertPreciseToNearest(preciseLocation)
-    setCoords(newCoords)
+    if (preciseLocation) {
+      let newCoords = convertPreciseToNearest(preciseLocation)
+      setCoords(newCoords)
+    }
 
   },[preciseLocation])
 
@@ -152,8 +154,12 @@ const App = () => {
   }
 
   useEffect(() => {
+
     ReactGA.send("pageview");
+    console.log("egg")
+
     let newcoords = checkQueryParams()
+    console.log(newcoords)
     setCoords(c => newcoords)
     setMapCentre(newcoords)
     
@@ -265,36 +271,40 @@ const App = () => {
   }
 
   useEffect(() => {
-    let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8)
+    console.log("bacon")
+    if (coords) {
+      let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8)
 
 
-    setValue(encodedWhos)
+      setValue(encodedWhos)
+      const url = new URL(window.location.href);
+      url.searchParams.set("q", encodedWhos.join("."));
+      setQuery(encodedWhos.join("."))
+      window.history.pushState(null, '', url);
 
-    const url = new URL(window.location.href);
-    url.searchParams.set("q", encodedWhos.join("."));
-    setQuery(encodedWhos.join("."))
-    window.history.pushState(null, '', url);
-
-    setRectangle([
-      [coords.lat+latSize/4,coords.lng+lngSize/4],
-      [coords.lat,coords.lng],
-    ])
-    
+      setRectangle([
+        [coords.lat+latSize/4,coords.lng+lngSize/4],
+        [coords.lat,coords.lng],
+      ])
+    }
 
   },[coords])
 
   useEffect(()=> {
+    console.log("sausage")
+
     let gridSize = 60
+    if (mapCentre) {
+      let centreCoords = {lat: Math.floor(4*((mapCentre.lat+180/2)/latSize))*latSize/4-180/2,
+      lng: Math.floor(4*((mapCentre.lng+360/2)/lngSize))*lngSize/4-360/2 }
 
-    let centreCoords = {lat: Math.floor(4*((mapCentre.lat+180/2)/latSize))*latSize/4-180/2,
-    lng: Math.floor(4*((mapCentre.lng+360/2)/lngSize))*lngSize/4-360/2 }
-
-    setHlines([...Array(gridSize).keys()].map(x => [
-      [centreCoords.lat+ latSize/4 * (x-gridSize/2.0), centreCoords.lng-1], [centreCoords.lat + latSize/4 * (x-gridSize/2.0), centreCoords.lng+1]
-    ]))
-    setVlines([...Array(gridSize).keys()].map(x => [
-      [centreCoords.lat-1, centreCoords.lng + lngSize/4 * (x-gridSize/2.0)], [centreCoords.lat + 1, centreCoords.lng+ lngSize/4 * (x-gridSize/2.0)]
-    ]))
+      setHlines([...Array(gridSize).keys()].map(x => [
+        [centreCoords.lat+ latSize/4 * (x-gridSize/2.0), centreCoords.lng-1], [centreCoords.lat + latSize/4 * (x-gridSize/2.0), centreCoords.lng+1]
+      ]))
+      setVlines([...Array(gridSize).keys()].map(x => [
+        [centreCoords.lat-1, centreCoords.lng + lngSize/4 * (x-gridSize/2.0)], [centreCoords.lat + 1, centreCoords.lng+ lngSize/4 * (x-gridSize/2.0)]
+      ]))
+    }
   },[mapCentre])
 
 
@@ -477,6 +487,8 @@ const App = () => {
       </div>
       
       </>}
+
+      {coords && mapCentre && hlines.length && vlines.length ? 
       <div id="mapcontainer">
         <MapContainer center={[coords.lat+ latSize/4,coords.lng+lngSize/8]} zoom={16} scrollWheelZoom={false} zoomControl={false} >
 
@@ -503,7 +515,7 @@ const App = () => {
 
           <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} setMapCentre={setMapCentre} lngSize={lngSize} latSize={latSize}/>
         </MapContainer>
-      </div>
+      </div> :""}
     </div>
   );
 }
