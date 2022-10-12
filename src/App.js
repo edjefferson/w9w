@@ -25,7 +25,7 @@ import {
 } from "react-share";
 
 import L from 'leaflet';
-import { useMap, MapContainer, TileLayer, Marker, Polyline, Rectangle, FeatureGroup, ZoomControl} from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Polyline, Rectangle, FeatureGroup, ZoomControl} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -62,6 +62,8 @@ const App = () => {
   const [preciseLocation,setPreciseLocation] = useState(0)
   const [zoomLevel,setZoomLevel] = useState(15)
   const [mapCentre,setMapCentre] = useState(0)
+  const [grids,setGrids] = useState(1)
+
   const [value,setValue] = useState([])
   const [aboutBox,setAboutBox] = useState(0)
   const [share,setShare] = useState(0)
@@ -302,7 +304,7 @@ const App = () => {
         [centreCoords.lat-1, centreCoords.lng + lngSize/4 * (x-gridSize/2.0)], [centreCoords.lat + 1, centreCoords.lng+ lngSize/4 * (x-gridSize/2.0)]
       ]))
     }
-  },[mapCentre])
+  },[mapCentre,zoomLevel])
 
 
 
@@ -409,6 +411,7 @@ const App = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
         setPreciseLocation({lat: position.coords.latitude, lng: position.coords.longitude});
+        
       });
     } else {
       console.log("no geolocation")
@@ -512,13 +515,14 @@ const App = () => {
           </FeatureGroup> 
           
           <FeatureGroup pathOptions={{ color: 'grey' }}>
-            {hlines.length ? hlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}
-            {vlines.length ? vlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}
-            
+            {grids ? 
+          <>{hlines.length ? hlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}
+            {vlines.length ? vlines.map((l,i) => <Polyline weight={0.7} opacity={0.5} positions={l} key={i} />) : ""}</> 
+            : ""}
           </FeatureGroup>
           </>:
           <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} setMapCentre={setMapCentre} lngSize={lngSize} latSize={latSize}/>
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} setMapCentre={setMapCentre} lngSize={lngSize} latSize={latSize} setGrids={setGrids}/>
         </MapContainer>
       </div> :""}
       <div id="geolocatebutton" onClick={geoLocate}><MyLocationIcon style={{color: "black"}}/></div>
