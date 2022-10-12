@@ -271,7 +271,7 @@ const App = () => {
 
   useEffect(() => {
     if (coords) {
-      let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8)
+      let encodedWhos = getEncodedWhos(coords.lat + latSize/8,coords.lng+ lngSize/8,4)
 
 
       setValue(encodedWhos)
@@ -460,7 +460,7 @@ const App = () => {
 
         <p>Search for any place or what9whos address</p>
       <p>e.g. Ianto Jones Shrine</p>
-      <ul className="wholist"><li>{"/////////"} Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.Capaldi.</li><li>Smith</li></ul></div>
+      <ul className="wholist"><li>{"/////////"} Smith.</li><li>Cushing.</li><li>Tennant.</li><li>Capaldi.</li><li>CBaker.</li><li>Tennant.</li><li>Gatwa.</li><li>Capaldi.</li><li>Smith</li></ul></div>
 }
       </>:
       <><div id="search-box-new" className="search-box"><div id="w9waddress" onClick={inputOn}><span id="slashessb">{"/////////"}</span><span id="whoscontainer">{formatw9w(value)}</span></div><div id="buttons">{copyState ? <span>Copied</span> : <div><ContentCopyIcon color="action" onClick={copyContent} /></div>}<div><SearchIcon onClick={inputOn} color="action"/></div></div></div>
