@@ -220,6 +220,10 @@ bottom:0;
   display: inline;
 } 
 
+.wholist a {
+  color: grey;
+}
+
 .wholist li { margin:0; float:left; width:auto; }
 
 #slashessb, #whoscontainer {
