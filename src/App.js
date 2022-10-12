@@ -226,7 +226,7 @@ const App = () => {
   }
  
 
-  const get_whos = (lat,lng,accuracy) => {
+  const getEncodedWhos = (lat,lng,accuracy) => {
     
     let [ys, final_lat] = convert(lat,"lat",accuracy,wholist.length)
     let [xs, final_lng] = convert(lng,"lng",accuracy,wholist.length)
@@ -238,7 +238,7 @@ const App = () => {
 
     let rotatedNumbers = rotateNumbers(numbers)
  
-    return [rotatedNumbers.map(n => wholist[n]),final_lat,final_lng]
+    return rotatedNumbers.map(n => wholist[n])
   }
 
   const deconvert = (squares,mode,how_many_whos) => {
@@ -309,9 +309,7 @@ const App = () => {
 
 
 
-  const getEncodedWhos = (lat,lng) => {
-    return get_whos(lat,lng,4)[0]
-  }
+
 
 
 
