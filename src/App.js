@@ -59,6 +59,7 @@ const App = () => {
   const [coords,setCoords] = useState(defaultLoc)
   const [preciseLocation,setPreciseLocation] = useState(defaultLoc)
   const [zoomLevel,setZoomLevel] = useState(15)
+  const [mapCentre,setMapCentre] = useState(defaultLoc)
   const [value,setValue] = useState([])
   const [aboutBox,setAboutBox] = useState(0)
   const [share,setShare] = useState(0)
@@ -111,11 +112,9 @@ const App = () => {
 
 
   const convertPreciseToNearest = (coords) => {
-    console.log(coords)
     let pcoords = {lat: Math.floor(4*((coords.lat+180/2)/latSize))*latSize/4-180/2,
     lng: Math.floor(4*((coords.lng+360/2)/lngSize))*lngSize/4-360/2 }
 
-    console.log(pcoords)
     return pcoords
      
   }
@@ -138,16 +137,13 @@ const App = () => {
       whos.forEach(w => {if(downcased_whos.indexOf(w) < 0) who_check = false })
       if (whos.length === 9 && who_check) {
         let [lat,lng] = decode_whos(whos,downcased_whos)
-        console.log(lat,lng)
 
         return {lat: lat, lng: lng}
         
       } else {
-        console.log("nah")
         return defaultLoc
       }
     } else {
-      console.log("nah")
 
       return defaultLoc
       
@@ -191,7 +187,6 @@ const App = () => {
   const get_final_grid = (final_lat,final_lng,lat,lng) => {
     let y = Math.floor(4*(lat - final_lat)/latSize)
     let x = Math.floor(4*(lng - final_lng)/lngSize)
-    console.log(y,x)
     x = x >= 4 ? 0 : x
     y = y >= 4 ? 0 : y
     return finalgrid[x][y]
@@ -200,7 +195,6 @@ const App = () => {
   const reverse_final_grid = (no) => {
     let x = finalgrid.findIndex(g => g.includes(no))
     let y = finalgrid[x].indexOf(no)
-    console.log(x,y)
     return [x,y]
   }
 
@@ -265,7 +259,6 @@ const App = () => {
 
     let lat = deconvert(ys,"lat",wholist.length) + final_grid_pos[1] * latSize/4
     let lng = deconvert(xs,"lng",wholist.length) + final_grid_pos[0] * lngSize/4
-    console.log("bring")
     return [lat,lng]
   }
 
@@ -285,14 +278,22 @@ const App = () => {
       [coords.lat,coords.lng],
     ])
     
-    let gridSize = 40
+
+  },[coords])
+
+  useEffect(()=> {
+    let gridSize = 60
+
+    let centreCoords = {lat: Math.floor(4*((mapCentre.lat+180/2)/latSize))*latSize/4-180/2,
+    lng: Math.floor(4*((mapCentre.lng+360/2)/lngSize))*lngSize/4-360/2 }
+
     setHlines([...Array(gridSize).keys()].map(x => [
-      [coords.lat+ latSize/4 * (x-gridSize/2.0), coords.lng-1], [coords.lat + latSize/4 * (x-gridSize/2.0), coords.lng+1]
+      [centreCoords.lat+ latSize/4 * (x-gridSize/2.0), centreCoords.lng-1], [centreCoords.lat + latSize/4 * (x-gridSize/2.0), centreCoords.lng+1]
     ]))
     setVlines([...Array(gridSize).keys()].map(x => [
-      [coords.lat-1, coords.lng + lngSize/4 * (x-gridSize/2.0)], [coords.lat + 1, coords.lng+ lngSize/4 * (x-gridSize/2.0)]
+      [centreCoords.lat-1, centreCoords.lng + lngSize/4 * (x-gridSize/2.0)], [centreCoords.lat + 1, centreCoords.lng+ lngSize/4 * (x-gridSize/2.0)]
     ]))
-  },[coords])
+  },[mapCentre])
 
 
 
@@ -484,7 +485,7 @@ const App = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {zoomLevel > 13 ?
+          {zoomLevel > 14 ?
           <>
           <FeatureGroup pathOptions={{ color: 'purple' }}>
             {rectangle[0] ? <Rectangle stroke={true} bounds={rectangle} /> : ""}
@@ -498,7 +499,7 @@ const App = () => {
           </>:
           <Marker  icon={DefaultIcon} position={[coords.lat,coords.lng]}/> }
 
-          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} get_whos={get_whos} lngSize={lngSize} latSize={latSize}/>
+          <RecenterAutomatically lat={coords.lat} lng={coords.lng} setPreciseLocation={setPreciseLocation} setZoomLevel={setZoomLevel} setInputState={setInputState} setShare={setShare} setMapCentre={setMapCentre} lngSize={lngSize} latSize={latSize}/>
         </MapContainer>
       </div>
     </div>
