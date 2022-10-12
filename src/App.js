@@ -153,7 +153,9 @@ const App = () => {
 
   useEffect(() => {
     ReactGA.send("pageview");
-    setCoords(c => checkQueryParams())
+    let newcoords = checkQueryParams()
+    setCoords(c => newcoords)
+    setMapCentre(newcoords)
     
   }, []);
   
