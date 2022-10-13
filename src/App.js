@@ -432,6 +432,11 @@ const App = () => {
           <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing the names of 9 actors who have played TV's (and film's) Doctor Who?</p>
           <p>We had, for some reason, so that's why we created what9whos.</p>
           <p>what9whos includes all 14 'main' Doctor Whos from Hartnell to Gatwa, plus John Hurt, Jo Martin and Peter Cushing. If you do not accept this as canon you are welcome to build your own Doctor Who-based geolocation system.</p>
+          <h4>FAQs</h4>
+          <p><b>Why does my w9w address has the same actor listed more than once?</b></p>
+          <p>This is a limitation caused by the relatively small number of people who have played Doctor Who compared to the thousands of words in other word-based location systems, but at least there's a much smaller chance that w9w will accidentally produce offensive addresses, unless you <i>really</i> don't like Sylvester McCoy.</p>
+          <p><b>Also, why?</b></p>
+          <p>Because.</p>
           <h4>Disclaimer</h4>
           <p>We would not recommend using what9whos in any kind of emergency situation (or at all).</p>
           <p>Doctor Who is the property of the BBC who have absolutely nothing to do with what9whos, so please don't blame them.</p>

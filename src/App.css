@@ -37,7 +37,16 @@
  
 }
 
-#about-content p, #about-content h3,  #about-content h4 {
+h3, h4 {
+  font-size: 1.2em;
+}
+
+#about-content h3,  #about-content h4 {
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+}
+
+#about-content p {
   padding-left: 1em;
   padding-right: 1em;
 }
