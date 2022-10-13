@@ -433,8 +433,8 @@ const App = () => {
           <p>We had, for some reason, so that's why we created what9whos.</p>
           <p>what9whos includes all 14 'main' Doctor Whos from Hartnell to Gatwa, plus John Hurt, Jo Martin and Peter Cushing. If you do not accept this as canon you are welcome to build your own Doctor Who-based geolocation system.</p>
           <h4>FAQs</h4>
-          <p><b>Why does my w9w address has the same actor listed more than once?</b></p>
-          <p>This is a limitation caused by the relatively small number of people who have played Doctor Who compared to the thousands of words in other word-based location systems, but at least there's a much smaller chance that w9w will accidentally produce offensive addresses, unless you <i>really</i> don't like Sylvester McCoy.</p>
+          <p><b>Why does my w9w address have the same actor listed more than once?</b></p>
+          <p>This is a limitation caused by the relatively small number of people who have played Doctor Who compared to the thousands of words in other word-based location systems. At least there's a much smaller chance that w9w will accidentally produce offensive addresses, unless you <i>really</i> don't like Sylvester McCoy.</p>
           <p><b>Also, why?</b></p>
           <p>Because.</p>
           <h4>Disclaimer</h4>
