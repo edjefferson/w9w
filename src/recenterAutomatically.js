@@ -10,7 +10,7 @@ const RecenterAutomatically = ({lat,lng,setPreciseLocation,setZoomLevel,setInput
       map.setView([lat + latSize/8, lng+lngSize/8])
       setMapCentre(map.getCenter())
     }
-  }, [lat, lng, setMapCentre, lngSize, latSize, map]);
+  }, [lat, lng, lngSize, latSize]);
 
    
 

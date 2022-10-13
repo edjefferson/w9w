@@ -354,7 +354,7 @@ const App = () => {
   
     
     
-  },[inputValue,latSize,lngSize,wholist])
+  },[inputValue,latSize,lngSize])
 
 
 
