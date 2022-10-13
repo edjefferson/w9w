@@ -428,7 +428,7 @@ const App = () => {
       {aboutBox ? <div id="aboutbox" ><div id="aboutboxclickcatcher" onClickCapture={aboutBoxCatcher}>
         <div id="abtitle"><h2><div id="slight"></div><span id="slashes">{"/////////"}</span>what9whos - about</h2> <CloseIcon onClick={()=> setAboutBox(0)} style={{color: "white"}} /></div>
         <div id="about-content-container" onClickCapture={aboutBoxCatcher}><div id="about-content">
-          <h3>The most Doctor Who-based way to talk about location</h3>
+          <h3>The most (unofficial) Doctor Who-based way to talk about location</h3>
           <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing the names of 9 actors who have played TV's (and film's) Doctor Who?</p>
           <p>We had, for some reason, so that's why we created what9whos.</p>
           <p>what9whos includes all 14 'main' Doctor Whos from Hartnell to Gatwa, plus John Hurt, Jo Martin and Peter Cushing. If you do not accept this as canon you are welcome to build your own Doctor Who-based geolocation system.</p>
