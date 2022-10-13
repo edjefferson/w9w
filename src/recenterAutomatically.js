@@ -6,12 +6,11 @@ const RecenterAutomatically = ({lat,lng,setPreciseLocation,setZoomLevel,setInput
 
   useEffect(() => {
     let bounds = map.getBounds();
-    console.log(bounds)
     if (lat < bounds._southWest.lat + latSize/4 || lat > bounds._northEast.lat - latSize * 1.6 || lng < bounds._southWest.lng + lngSize/4 || lng > bounds._northEast.lng - lngSize * 3/4) {
       map.setView([lat + latSize/8, lng+lngSize/8])
       setMapCentre(map.getCenter())
     }
-  }, [lat, lng]);
+  }, [lat, lng, setMapCentre, lngSize, latSize, map]);
 
    
 

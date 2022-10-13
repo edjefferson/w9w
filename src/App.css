@@ -5,25 +5,46 @@
   z-index: 100;
   position: absolute;
   top: 0;
-  background-color: #f2f4f5;
+  background-color: rgba(242, 244, 245,0.5);
   color: grey;
   left: 0;
   width: 100%;
   height: 100%;
   overflow-y: scroll;
 }
+#aboutboxclickcatcher {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
 
-#about-content{
+}
+#about-content-container{
   width: 100%;
   height: auto;
   margin: 0;
-  margin-top:7em;
+  z-index: 10;
+
+  background-color: #f2f4f5;
+}
+#about-content{
+  z-index: 10;
+
+  width: 100%;
+  height: fit-content;
+  margin: 0;
+  padding-top:7em;
  
 }
 
 #about-content p, #about-content h3,  #about-content h4 {
   padding-left: 1em;
   padding-right: 1em;
+}
+
+#aboutbackicon {
+  text-align: center;
+  padding-bottom: 2em;
 }
 
 .leaflet-container {
@@ -259,15 +280,42 @@ bottom:0;
   background-color: grey;
 }
 
+.element {
+  animation: pulse 5s infinite;
+}
+
+
+
+#slight {
+  display: inline-block;
+  height: 0.3em;
+  width: 0.35em;
+  margin-right: 0.1em;
+  margin-bottom: 0.15em;
+  background-color: white;
+  animation: pulse 5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 #slashes {
   font-weight: 500;
   display: inline-block;
-
+  height: 1.3em;
   background-color: #003b6f;
-  padding: 0.5em;
+  padding: 0.3em;
   padding-top: 0.25em;
   padding-bottom: 0.4em;
-  
+  margin-top: 0;
   margin-right: 0.5em;
 }
 
@@ -334,6 +382,15 @@ h1,h2 {
 
   }
 
+
+}
+@media only screen and ( min-width: 600px) {
+  #about-content-container {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+
+  }
 }
 @media only screen and ( min-width: 750px) {
   .search-box {
@@ -350,6 +407,7 @@ h1,h2 {
 
     width: 90%;
   }
+
 }
 
 @media only screen and ( min-width: 900px) {
