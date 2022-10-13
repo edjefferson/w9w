@@ -426,7 +426,7 @@ const App = () => {
     <div className="App">
       <div id="title"><h1><div id="slight"></div><span id="slashes">{"/////////"}</span>what9whos</h1> <InfoOutlinedIcon onClick={()=> setAboutBox(1)} style={{color: "white"}} /></div>
       {aboutBox ? <div id="aboutbox" ><div id="aboutboxclickcatcher" onClickCapture={aboutBoxCatcher}>
-        <div id="abtitle"><h2><span id="slashes">{"/////////"}</span>what9whos - about</h2> <CloseIcon onClick={()=> setAboutBox(0)} style={{color: "white"}} /></div>
+        <div id="abtitle"><h2><div id="slight"></div><span id="slashes">{"/////////"}</span>what9whos - about</h2> <CloseIcon onClick={()=> setAboutBox(0)} style={{color: "white"}} /></div>
         <div id="about-content-container" onClickCapture={aboutBoxCatcher}><div id="about-content">
           <h3>The most Doctor Who-based way to talk about location</h3>
           <p>Have you ever wished that you could describe the precise location of anywhere in the world by simply listing the names of 9 actors who have played TV's (and film's) Doctor Who?</p>
